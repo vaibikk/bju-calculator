@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="БЖУ-калькулятор: рассчитай норму калорий по росту, весу и полу, составь меню на завтрак, обед и ужин, получи советы помощника и прогноз веса. Светлая и тёмная темы.">
+<meta property="og:title" content="БЖУ-калькулятор с помощником по питанию">
+<meta property="og:description" content="Норма калорий, меню на день, советы и прогноз веса. Бесплатно, премиум-функции за 199 ₽.">
+<meta property="og:type" content="website">
+<title>БЖУ-калькулятор — считай еду легко</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--ink:#14181f;--muted:#6b7280;--card:#f5f6fa;--line:#e6e8ef;--p:#ff6b6b;--f:#f5b700;--u:#2ec4b6;--acc:#14181f;--on:#fff;
+--d:'Unbounded','Arial Black',system-ui,sans-serif;--b:'Golos Text',system-ui,-apple-system,'Segoe UI',sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="dark"]{--bg:#0d1016;--ink:#f1f3f8;--muted:#9aa3b5;--card:#171b24;--line:#2a303c;--acc:#f1f3f8;--on:#0d1016}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--b);line-height:1.5;transition:background .4s,color .4s}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 110px}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.logo{font-family:var(--d);font-weight:800;font-size:18px}.logo b{color:var(--p)}.logo i{color:var(--f);font-style:normal}.logo u{color:var(--u);text-decoration:none}
+#theme{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:22px;cursor:pointer;transition:transform .5s}
+#theme.spin{transform:rotate(360deg)}
+h1{font-family:var(--d);font-weight:800;font-size:clamp(28px,8vw,44px);line-height:1.1;margin:8px 0 8px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:0 0 20px}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:20px;display:grid;gap:18px;grid-template-columns:150px 1fr;align-items:center}
+@media(max-width:480px){.hero{grid-template-columns:1fr;justify-items:center}.macros{width:100%}}
+.ring{position:relative;width:150px;height:150px}.ring svg{transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:13;stroke-linecap:round}.tr{stroke:var(--line)}
+#arc{stroke:url(#g);stroke-dasharray:314;stroke-dashoffset:314;transition:stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)}
+.ctr{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ctr b{font-family:var(--d);font-size:30px;font-weight:800;line-height:1}.ctr span{font-size:12px;color:var(--muted)}
+.macros{display:grid;gap:12px}.m .top{display:flex;justify-content:space-between;font-weight:700;font-size:15px}
+.m .top span:last-child{font-family:var(--d);font-size:14px}.bar{height:10px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;width:0;border-radius:9px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.goal{margin-top:12px;font-size:14px;color:var(--muted)}
+input{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;outline:0;width:100%}
+input:focus{border-color:var(--acc)}.goal input{width:90px;display:inline-block;padding:6px 10px;margin:0 4px}
+h2{font-family:var(--d);font-weight:500;font-size:20px;margin:30px 0 12px}
+#plate .empty{color:var(--muted);text-align:center;padding:22px;border:2px dashed var(--line);border-radius:22px}
+.empty span{display:inline-block;font-size:38px;animation:float 1.6s ease-in-out infinite}
+.row{display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:10px 12px;margin-bottom:8px;animation:slide .35s both}
+.row .e{font-size:30px;text-align:center}.row b{display:block;font-size:15px}.row small{color:var(--muted);font-size:12px}
+.gr{display:flex;align-items:center;gap:4px}.gr input{width:64px;text-align:center;padding:7px 4px}
+.sq{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:18px;cursor:pointer}
+.x{border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer;transition:.2s}
+.chip.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;transition:transform .25s,box-shadow .25s;animation:up .5s both}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(0,0,0,.14)}
+.tile{height:92px;display:grid;place-items:center;font-size:50px;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 38%,var(--card)),color-mix(in srgb,var(--c) 10%,var(--card)))}
+.card:hover .tile span{animation:float .9s ease-in-out infinite}
+.add{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;border:0;background:var(--acc);color:var(--on);font-size:22px;line-height:1;cursor:pointer}
+.add.pop{animation:pop .4s}.info{padding:10px 12px 12px}.info b{display:block;font-size:14px;line-height:1.25;min-height:35px}
+.kc{font-family:var(--d);font-size:13px;margin:4px 0 6px}.mm{display:flex;gap:6px;font-size:12px;font-weight:700}
+.mm span{display:flex;align-items:center;gap:3px}.mm i{width:8px;height:8px;border-radius:50%;display:inline-block}
+details{margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px 16px}
+summary{cursor:pointer;font-weight:700}.cf{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.cf input:first-child{grid-column:span 2}
+.go{grid-column:span 2;background:var(--acc);color:var(--on);border:0;border-radius:14px;padding:12px;font:inherit;font-weight:700;cursor:pointer}
+#bar{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translate(-50%,120px);background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:14px 22px;font:700 15px var(--b);cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.2,.8,.2,1);z-index:9;white-space:nowrap}
+#bar.show{transform:translate(-50%,0)}#bar.bump{animation:bump .35s}
+.none{grid-column:1/-1;text-align:center;color:var(--muted);padding:30px}
+footer{color:var(--muted);font-size:12px;margin-top:30px}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes slide{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+@keyframes float{50%{transform:translateY(-6px) rotate(-6deg)}}
+@keyframes pop{40%{transform:scale(1.35) rotate(90deg)}}
+@keyframes bump{40%{transform:translate(-50%,-6px) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:10px 8px;font:inherit;font-size:14px;cursor:pointer;transition:.2s;white-space:nowrap}
+.seg button.on{background:var(--acc);color:var(--on);border-color:var(--acc);transform:scale(1.03)}.meals{margin:4px 0 12px}
+.pf{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.pf .seg,.pf .go,.pf .full{grid-column:span 2}.pf label{font-size:12px;color:var(--muted)}
+.norm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 6px}.norm div{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:10px 14px;animation:up .4s both}
+.norm span{display:block;font-size:12px;color:var(--muted)}.norm b{font-family:var(--d);font-size:17px}.nm{font-size:14px}
+.warn{color:#e5484d;font-size:13px;margin:8px 0 0}.tiny{color:var(--muted);font-size:12px;margin:8px 0 0}
+.coach{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:16px;margin-top:16px}
+.av{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:28px;background:linear-gradient(135deg,var(--u),var(--f));animation:float 2.4s ease-in-out infinite}
+.coach b{font-family:var(--d);font-size:14px}#msg{margin:4px 0 8px;font-size:15px}
+.note{border-radius:14px;padding:10px 12px;margin:8px 0;font-size:14px;animation:up .4s both}.note:empty{display:none}
+.note.warn{background:color-mix(in srgb,#ff7b54 18%,var(--card));color:var(--ink)}.note.ok{background:color-mix(in srgb,#2ec4b6 18%,var(--card))}
+.sug{display:flex;flex-wrap:wrap;gap:6px}.sug button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;cursor:pointer;animation:up .4s both}
+.sug button:hover{border-color:var(--acc)}
+.fc{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:16px;margin-top:12px;font-size:14px}.fc b{font-family:var(--d);font-size:14px}.fc p{margin:6px 0}
+.fc .big{font-family:var(--d);font-size:20px}.fc .up{color:#e5484d}.fc .dn{color:#2ea36b}
+.mh{display:flex;justify-content:space-between;margin:14px 2px 8px}.mh span{color:var(--muted);font-size:13px}.mt{color:var(--muted);font-size:13px;margin:0 2px 8px}
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);width:min(92vw,520px);background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:18px;padding:12px 16px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.35s;z-index:10}
+#toast.on{opacity:1;transform:translate(-50%,0)}#toast.warn{border-color:#ff7b54}#toast.ok{border-color:#2ec4b6}
+
+.prem{margin-top:16px;border-radius:26px;padding:18px;border:2px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,#ff6b6b,#f5b700,#2ec4b6) border-box}
+.pt{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--d)}.pr{background:var(--acc);color:var(--on);border-radius:999px;padding:6px 12px;font-size:13px}
+.pf2{padding-left:0;list-style:none;margin:12px 0;font-size:14px}.pf2 li{margin:6px 0}.st{padding-left:20px;font-size:14px}.st li{margin:8px 0}
+.sq2{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;margin-left:6px}
+.st a{color:var(--ink);font-weight:700}.cr{display:flex;gap:8px;margin-top:10px}.cr .go{width:auto;grid-column:auto;padding:0 18px}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.tools button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:12px 8px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:.2s}
+.tools button:hover{border-color:var(--acc);transform:translateY(-2px)}pre#slo{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;font:13px var(--b);margin:8px 0}pre#slo:empty{display:none}
+.dr{display:grid;grid-template-columns:44px 1fr 74px;gap:8px;align-items:center;font-size:12px;margin:6px 0}#hl{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:14px;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo"><b>Б</b><i>Ж</i><u>У</u> калькулятор</div><button id="theme" aria-label="Сменить тему">🌙</button></header>
+<h1>Считай еду легко</h1>
+<p class="sub">Выбери продукты, укажи граммы, и калории с белками, жирами и углеводами посчитаются сами.</p>
+<div class="hero">
+<div class="ring"><svg width="150" height="150" viewBox="0 0 120 120"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff6b6b"/><stop offset=".5" stop-color="#f5b700"/><stop offset="1" stop-color="#2ec4b6"/></linearGradient></defs><circle class="tr" cx="60" cy="60" r="50"/><circle id="arc" cx="60" cy="60" r="50"/></svg>
+<div class="ctr"><div><b id="kc">0</b><span id="ks">ккал</span></div></div></div>
+<div><div class="macros">
+<div class="m"><div class="top"><span>Белки</span><span id="p">0 г</span></div><div class="bar"><i id="bp" style="background:var(--p)"></i></div></div>
+<div class="m"><div class="top"><span>Жиры</span><span id="f">0 г</span></div><div class="bar"><i id="bf" style="background:var(--f)"></i></div></div>
+<div class="m"><div class="top"><span>Углеводы</span><span id="u">0 г</span></div><div class="bar"><i id="bu" style="background:var(--u)"></i></div></div></div>
+<div class="goal">Заполни параметры ниже, чтобы получить свою норму.</div></div>
+</div>
+<details class="prof" open><summary>📏 Мои параметры и норма в день</summary>
+<div class="pf"><div class="seg" id="sex"><button data-s="m" class="on">👨 Мужчина</button><button data-s="f">👩 Женщина</button></div>
+<div><label>Возраст, лет</label><input id="age" type="number" inputmode="numeric" value="30"></div>
+<div><label>Рост, см</label><input id="h" type="number" inputmode="numeric" value="175"></div>
+<div><label>Вес, кг</label><input id="w" type="number" inputmode="decimal" value="75"></div>
+<div><label>Желаемый вес, кг</label><input id="tw" type="number" inputmode="decimal" placeholder="необязательно"></div>
+<div class="full"><label>Активность</label><select id="act"><option value="1.2">Сидячий образ жизни</option><option value="1.375" selected>Лёгкая: 1–3 тренировки в неделю</option><option value="1.55">Средняя: 3–5 тренировок</option><option value="1.725">Высокая: 6–7 тренировок</option><option value="1.9">Очень высокая: физический труд и спорт</option></select></div>
+<div class="full"><label>Цель</label><select id="gl"><option value="lose">Похудеть</option><option value="keep" selected>Держать вес</option><option value="gain">Набрать вес</option></select></div>
+<button class="go" id="calc">Рассчитать мою норму</button></div><div id="normOut"></div></details>
+<div class="coach"><div class="av">🥑</div><div style="flex:1;min-width:0"><b>Нутри · помощник по питанию</b><div id="msg"></div><div class="note" id="note"></div><div class="sug" id="sug"></div></div></div>
+<div class="fc" id="fc"></div>
+<section class="prem" id="prem"><div class="pt"><span>⭐ Премиум</span><span class="pr">199 ₽ · один раз</span></div>
+<div id="lock"><ul class="pf2"><li>🪄 Автоменю на день под твою норму одним нажатием</li><li>🛒 Список покупок из твоего рациона</li><li>📈 Дневник на 7 дней: калории и вес</li><li>💧 Норма воды, ИМТ и здоровый диапазон веса</li><li>📋 Копирование рациона, чтобы отправить тренеру или друзьям</li></ul>
+<ol class="st"><li>Переведи <b>199 ₽</b> по СБП на номер <b>+7 926 289-17-07</b> (получатель Дмитрий Г.)<button class="sq2" id="cp">Скопировать номер</button></li><li>Пришли чек в Telegram <a href="https://t.me/dima_sites_bots?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%9E%D0%BF%D0%BB%D0%B0%D1%82%D0%B8%D0%BB%28%D0%B0%29%20%D0%9F%D1%80%D0%B5%D0%BC%D0%B8%D1%83%D0%BC%20%D0%91%D0%96%D0%A3-%D0%BA%D0%B0%D0%BB%D1%8C%D0%BA%D1%83%D0%BB%D1%8F%D1%82%D0%BE%D1%80%D0%B0%20199%20%E2%82%BD%20%D0%BF%D0%BE%20%D0%A1%D0%91%D0%9F.%20%D0%9F%D1%80%D0%B8%D1%88%D0%BB%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D0%BA%D0%BE%D0%B4%20%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%B0." target="_blank" rel="noopener">@dima_sites_bots</a></li><li>Получи код доступа и введи его ниже</li></ol>
+<div class="cr"><input id="code" placeholder="Код: XXXX-XXXX-XXXX" autocapitalize="characters"><button class="go" id="unl">Открыть</button></div><div id="cmsg" class="warn"></div></div>
+<div id="open" style="display:none"><div class="tools"><button id="am">🪄 Составить меню на день</button><button id="sl">🛒 Список покупок</button><button id="sv">💾 Сохранить день</button><button id="rt">📋 Скопировать рацион</button></div>
+<pre id="slo"></pre><div id="hl"></div><h2 style="font-size:16px;margin:16px 0 6px">📈 Дневник за 7 дней</h2><div id="dzo"></div></div></section>
+<h2 id="pl">Моя тарелка</h2><div id="plate"></div>
+<h2>Продукты</h2>
+<div class="seg meals" id="meals"></div>
+<input id="q" type="search" placeholder="🔍 Найти продукт: курица, рис, яблоко…">
+<div class="chips" id="chips"></div>
+<div class="grid" id="grid"></div>
+<details><summary>➕ Нет продукта? Добавь свой</summary>
+<div class="cf"><input id="cn" placeholder="Название"><input id="ck" type="number" inputmode="decimal" placeholder="Ккал на 100 г"><input id="cp" type="number" inputmode="decimal" placeholder="Белки, г"><input id="cf" type="number" inputmode="decimal" placeholder="Жиры, г"><input id="cu" type="number" inputmode="decimal" placeholder="Углеводы, г"><button class="go" id="cg">Добавить в список</button></div></details>
+<footer>Значения указаны на 100 г продукта и средние; у разных производителей они отличаются. Расчёты и советы Нутри справочные и примерные, это не медицинская рекомендация; при заболеваниях и беременности советуйся с врачом. Сайт создал Дмитрий Гаврилов. Делаю сайты и ботов на заказ: <a href="https://t.me/dima_sites_bots" style="color:inherit;font-weight:700">@dima_sites_bots</a>.</footer>
+</div>
+<div id="toast"></div><button id="bar"></button>
+<script>
+var RAW=`Куриная грудка (варёная)|🍗|meat|165|31|3.6|0
+Куриное бедро (запечённое)|🍗|meat|209|26|11|0
+Индейка (грудка)|🦃|meat|114|24|1.5|0
+Говядина (варёная)|🥩|meat|250|26|15|0
+Говяжий фарш|🥩|meat|254|17|20|0
+Свиная шея|🥩|meat|259|16|21|0
+Свиная вырезка|🥩|meat|135|21|5.5|0
+Телятина|🥩|meat|97|19|2|0
+Печень говяжья|🥩|meat|135|20|3.6|4
+Баранина|🍖|meat|209|16|16|0
+Бекон|🥓|meat|541|37|42|1.4
+Ветчина|🍖|meat|145|19|7|1.5
+Колбаса варёная|🌭|meat|257|12|23|1
+Сосиски|🌭|meat|266|11|24|1
+Лосось|🐟|fish|208|20|13|0
+Форель|🐟|fish|141|20|6|0
+Треска|🐟|fish|82|18|0.7|0
+Минтай|🐟|fish|72|16|0.9|0
+Скумбрия|🐟|fish|205|19|14|0
+Сельдь|🐟|fish|217|18|16|0
+Тунец консервированный|🐟|fish|116|26|1|0
+Креветки|🦐|fish|99|24|0.3|0.2
+Кальмар|🦑|fish|92|18|2|3
+Мидии|🦪|fish|86|12|2|4
+Красная икра|🍣|fish|261|25|18|4
+Крабовые палочки|🦀|fish|80|6|1|11
+Молоко 2.5%|🥛|dairy|52|2.8|2.5|4.7
+Кефир 1%|🥛|dairy|40|3|1|4
+Ряженка 4%|🥛|dairy|67|2.9|4|4.2
+Йогурт натуральный|🥣|dairy|60|4|3|4
+Творог 5%|🧀|dairy|121|17|5|1.8
+Творог обезжиренный|🧀|dairy|71|16|0.6|1.3
+Сметана 20%|🥛|dairy|206|2.8|20|3.2
+Сливки 20%|🥛|dairy|205|2.8|20|3.7
+Сыр твёрдый|🧀|dairy|360|24|29|0
+Моцарелла|🧀|dairy|240|18|17|2
+Фета|🧀|dairy|264|14|21|4
+Сливочное масло|🧈|dairy|748|0.5|82.5|0.8
+Яйцо куриное|🥚|dairy|157|12.7|11.5|0.7
+Яичный белок|🥚|dairy|52|11|0.2|0.7
+Мороженое пломбир|🍦|dairy|227|3.2|15|20
+Гречка (варёная)|🍚|grain|110|4.2|1.1|21
+Рис белый (варёный)|🍚|grain|130|2.7|0.3|28
+Рис бурый (варёный)|🍚|grain|111|2.6|0.9|23
+Овсяные хлопья (сухие)|🥣|grain|366|12.3|6.1|59.5
+Овсянка на воде|🥣|grain|88|3|1.7|15
+Макароны (варёные)|🍝|grain|158|5.8|0.9|31
+Булгур (варёный)|🌾|grain|83|3|0.2|19
+Кускус (варёный)|🌾|grain|112|3.8|0.2|23
+Перловка (варёная)|🌾|grain|109|3.1|0.4|22
+Пшено (варёное)|🌾|grain|119|3.5|1|23
+Фасоль (варёная)|🫘|grain|123|7.8|0.5|21.5
+Чечевица (варёная)|🫘|grain|116|9|0.4|20
+Нут (варёный)|🫘|grain|164|8.9|2.6|27
+Картофель (варёный)|🥔|grain|82|2|0.4|16.7
+Картофель жареный|🍟|grain|192|2.8|9.5|23
+Картофельное пюре|🥔|grain|106|2|3.5|16
+Мюсли|🥣|grain|352|11|6|66
+Кукурузные хлопья|🥣|grain|357|7|0.9|84
+Хлеб белый|🍞|bread|266|7.6|3|50
+Хлеб ржаной|🍞|bread|214|6.6|1.2|40
+Хлеб цельнозерновой|🍞|bread|247|13|3.4|41
+Лаваш|🫓|bread|236|7.9|1|49
+Круассан|🥐|bread|406|8|21|45
+Блины|🥞|bread|233|6.1|12|26
+Сырники|🥞|bread|220|17|10|18
+Пельмени|🥟|bread|275|12|13|29
+Пицца|🍕|bread|266|11|10|33
+Печенье овсяное|🍪|bread|437|6.5|14|71
+Огурец|🥒|veg|15|0.8|0.1|2.8
+Помидор|🍅|veg|20|1.1|0.2|3.7
+Морковь|🥕|veg|35|1.3|0.1|6.9
+Капуста белокочанная|🥬|veg|27|1.8|0.1|4.7
+Брокколи|🥦|veg|34|2.8|0.4|6.6
+Цветная капуста|🥦|veg|25|2|0.3|5
+Болгарский перец|🫑|veg|27|1.3|0.1|5.3
+Лук репчатый|🧅|veg|41|1.4|0.2|8.2
+Чеснок|🧄|veg|143|6.5|0.5|29.9
+Свёкла|🍠|veg|42|1.5|0.1|8.8
+Баклажан|🍆|veg|24|1.2|0.1|4.5
+Кабачок|🥒|veg|24|0.6|0.3|4.6
+Тыква|🎃|veg|28|1.3|0.3|7.7
+Шпинат|🥬|veg|23|2.9|0.4|3.6
+Салат листовой|🥬|veg|15|1.4|0.2|2.2
+Шампиньоны|🍄|veg|27|4.3|1|0.1
+Зелёный горошек|🫛|veg|72|5|0.2|13.8
+Кукуруза консервированная|🌽|veg|119|4.1|1.2|22.5
+Оливки|🫒|veg|115|0.8|10.7|6.3
+Яблоко|🍎|fruit|52|0.3|0.2|13.8
+Банан|🍌|fruit|89|1.1|0.3|22.8
+Апельсин|🍊|fruit|47|0.9|0.1|11.8
+Мандарин|🍊|fruit|38|0.8|0.2|8.1
+Лимон|🍋|fruit|29|1.1|0.3|9.3
+Виноград|🍇|fruit|69|0.7|0.2|18
+Груша|🍐|fruit|57|0.4|0.1|15.2
+Персик|🍑|fruit|39|0.9|0.3|9.5
+Слива|🍑|fruit|46|0.7|0.3|11.4
+Клубника|🍓|fruit|32|0.7|0.3|7.7
+Малина|🍓|fruit|52|1.2|0.7|11.9
+Черника|🫐|fruit|57|0.7|0.3|14.5
+Арбуз|🍉|fruit|30|0.6|0.2|7.6
+Дыня|🍈|fruit|34|0.8|0.2|8.2
+Киви|🥝|fruit|61|1.1|0.5|14.7
+Ананас|🍍|fruit|50|0.5|0.1|13.1
+Манго|🥭|fruit|60|0.8|0.4|15
+Вишня|🍒|fruit|63|1.1|0.2|16
+Авокадо|🥑|fruit|160|2|14.7|8.5
+Миндаль|🌰|nuts|579|21|50|22
+Грецкий орех|🌰|nuts|654|15|65|14
+Арахис|🥜|nuts|567|26|49|16
+Фундук|🌰|nuts|628|15|61|17
+Кешью|🥜|nuts|553|18|44|30
+Семечки подсолнечника|🌻|nuts|584|21|51|20
+Семена чиа|🌱|nuts|486|17|31|42
+Арахисовая паста|🥜|nuts|588|25|50|20
+Изюм|🍇|nuts|299|3.1|0.5|79
+Курага|🍑|nuts|241|3.4|0.5|63
+Финики|🌴|nuts|282|2.5|0.4|75
+Молочный шоколад|🍫|sweet|534|7.7|30|59
+Тёмный шоколад|🍫|sweet|598|7.8|42.6|45.9
+Мёд|🍯|sweet|304|0.8|0|82
+Сахар|🍬|sweet|387|0|0|100
+Варенье|🍓|sweet|263|0.3|0.1|70
+Зефир|🍡|sweet|299|0.8|0|78
+Халва|🍬|sweet|523|11.6|29.7|54
+Пончик|🍩|sweet|300|5|15|36
+Мармелад|🍬|sweet|296|0.4|0.1|75
+Сгущённое молоко|🥛|sweet|328|7.2|8.5|56
+Вода|💧|drink|0|0|0|0
+Кофе чёрный|☕|drink|2|0.2|0|0.3
+Латте|☕|drink|45|2.6|2.3|3.5
+Чай чёрный|🍵|drink|1|0|0|0.3
+Апельсиновый сок|🧃|drink|45|0.7|0.2|10.4
+Яблочный сок|🧃|drink|46|0.1|0.1|11.3
+Кола|🥤|drink|42|0|0|10.6
+Пиво|🍺|drink|43|0.5|0|3.6
+Красное вино|🍷|drink|83|0.1|0|2.6
+Квас|🥤|drink|27|0.2|0|5.2
+Борщ|🍲|dish|49|1.1|3|5
+Куриный суп|🍜|dish|36|3|1.3|3.5
+Омлет|🍳|dish|184|9.6|14.3|1.8
+Яичница|🍳|dish|196|13.6|15.3|0.8
+Оливье|🥗|dish|198|5.5|15|9
+Греческий салат|🥗|dish|117|2.8|10|5
+Цезарь с курицей|🥗|dish|190|12|12|8
+Плов|🍛|dish|175|6|9|18
+Куриная котлета|🍗|dish|205|16|12|9
+Бургер|🍔|dish|250|13|12|30
+Картофель фри|🍟|dish|312|3.4|15|41
+Шаурма|🌯|dish|220|11|11|20
+Суши-ролл|🍣|dish|140|4.5|2|25
+Хот-дог|🌭|dish|290|10|17|23
+Подсолнечное масло|🌻|sauce|899|0|99.9|0
+Оливковое масло|🫒|sauce|898|0|99.8|0
+Майонез|🥫|sauce|627|0.5|67|3
+Кетчуп|🍅|sauce|93|1.8|1|19
+Соевый соус|🥢|sauce|53|8|0.6|4.9
+Томатная паста|🍅|sauce|82|4.8|0.1|16.7
+Хумус|🧆|sauce|166|8|9.6|14`;
+var CATS={all:["Все","✨","#7b61ff"],meat:["Мясо","🥩","#ef476f"],fish:["Рыба","🐟","#118ab2"],dairy:["Молочное и яйца","🥛","#4cc9f0"],grain:["Крупы и гарниры","🌾","#e9b44c"],bread:["Хлеб и выпечка","🍞","#d4a373"],veg:["Овощи","🥦","#52b788"],fruit:["Фрукты","🍎","#ff7b54"],nuts:["Орехи","🥜","#a47551"],sweet:["Сладкое","🍫","#b5179e"],drink:["Напитки","🥤","#00b4d8"],dish:["Готовые блюда","🍲","#f77f00"],sauce:["Масла и соусы","🫒","#8ac926"],my:["Мои","⭐","#7b61ff"]};
+var FOODS=RAW.split("\n").map(function(l){var a=l.split("|");return{n:a[0],e:a[1],c:a[2],k:+a[3],p:+a[4],f:+a[5],u:+a[6]}});
+var MEALS=[["Завтрак","🌅",.3],["Обед","☀️",.35],["Ужин","🌙",.25],["Перекус","🍎",.1]];
+var ALT={sweet:"фрукты, ягоды или горсть орехов (30 г)",drink:"воду, чай или кофе без сахара",dish:"суп, омлет или запечённое мясо с овощами",meat:"курицу, индейку или рыбу",sauce:"1 ч. ложку масла или натуральный йогурт",dairy:"творог, кефир или натуральный йогурт",bread:"цельнозерновой хлеб",grain:"гречку или бурый рис",nuts:"порцию поменьше (до 30 г)",fish:"запечённую рыбу",veg:"овощи",fruit:"фрукты",my:"что-то полегче"};
+var hr=new Date().getHours(),cm=hr<11?0:hr<16?1:hr<21?2:3;
+var cat="all",q="",plate=[],P=null,TD=null,sex="m",T={k:2000,p:100,f:70,u:250},tt;
+var $=function(s){return document.querySelector(s)},r1=function(x){return Math.round(x*10)/10};
+function chips(){$("#chips").innerHTML=Object.keys(CATS).map(function(k){return '<button class="chip'+(k===cat?' on':'')+'" data-c="'+k+'">'+CATS[k][1]+' '+CATS[k][0]+'</button>'}).join("")}
+function meals(){$("#meals").innerHTML=MEALS.map(function(m,i){return '<button data-m="'+i+'"'+(i===cm?' class="on"':'')+'>'+m[1]+' '+m[0]+'</button>'}).join("")}
+function grid(){var h="",n=0;FOODS.forEach(function(x,i){if((cat==="all"||x.c===cat)&&x.n.toLowerCase().indexOf(q)>-1){h+='<div class="card" style="--c:'+CATS[x.c][2]+';animation-delay:'+Math.min(n++*25,500)+'ms"><div class="tile"><span>'+x.e+'</span></div><button class="add" data-i="'+i+'" aria-label="Добавить">+</button><div class="info"><b>'+x.n+'</b><div class="kc">'+x.k+' ккал</div><div class="mm"><span><i style="background:var(--p)"></i>'+x.p+'</span><span><i style="background:var(--f)"></i>'+x.f+'</span><span><i style="background:var(--u)"></i>'+x.u+'</span></div></div></div>'}});$("#grid").innerHTML=h||'<div class="none">Ничего не найдено. Добавь свой продукт ниже 👇</div>'}
+function num(el,to,s){var from=el._v||0,t0=performance.now();el._v=to;(function st(t){var k=Math.min((t-t0)/600,1);el.textContent=r1(from+(to-from)*k)+(s||"");if(k<1)requestAnimationFrame(st)})(t0)}
+function sums(){var S={k:0,p:0,f:0,u:0,m:[0,0,0,0]};plate.forEach(function(it){var x=FOODS[it.i],m=it.g/100;S.k+=x.k*m;S.p+=x.p*m;S.f+=x.f*m;S.u+=x.u*m;S.m[it.m]+=x.k*m});return S}
+function totals(){var S=sums();num($("#kc"),Math.round(S.k));$("#ks").textContent="ккал из "+T.k;num($("#p"),S.p," / "+T.p+" г");num($("#f"),S.f," / "+T.f+" г");num($("#u"),S.u," / "+T.u+" г");
+$("#arc").style.strokeDashoffset=314-314*Math.min(S.k/T.k,1);$("#arc").style.stroke=S.k>T.k*1.05?"#ef476f":"";
+$("#bp").style.width=Math.min(S.p/T.p,1)*100+"%";$("#bf").style.width=Math.min(S.f/T.f,1)*100+"%";$("#bu").style.width=Math.min(S.u/T.u,1)*100+"%";
+MEALS.forEach(function(m,i){var e=$("#ms"+i);if(e)e.textContent=Math.round(S.m[i])+" / "+Math.round(T.k*m[2])+" ккал"});
+var b=$("#bar");b.textContent="🍽 "+plate.length+" · "+Math.round(S.k)+" ккал ↑";b.classList.toggle("show",plate.length>0)}
+function rowTxt(it){var x=FOODS[it.i],m=it.g/100;return Math.round(x.k*m)+" ккал · Б "+r1(x.p*m)+" · Ж "+r1(x.f*m)+" · У "+r1(x.u*m)}
+function row(j){var it=plate[j];return '<div class="row" data-j="'+j+'"><div class="e">'+FOODS[it.i].e+'</div><div><b>'+FOODS[it.i].n+'</b><small>'+rowTxt(it)+'</small></div><div class="gr"><button class="sq" data-d="-10">−</button><input type="number" inputmode="numeric" value="'+it.g+'"><button class="sq" data-d="10">+</button><button class="x" data-x="1" aria-label="Убрать">✕</button></div></div>'}
+function pl(){var h="";MEALS.forEach(function(ml,mi){var js=[];plate.forEach(function(it,j){if(it.m===mi)js.push(j)});h+='<div class="mh"><b>'+ml[1]+' '+ml[0]+'</b><span id="ms'+mi+'"></span></div>'+(js.length?js.map(row).join(""):'<div class="mt">Пока пусто. Выбери «'+ml[0]+'» ниже и добавляй продукты.</div>')});$("#plate").innerHTML=h}
+function judge(x,g){var m=g/100,k=Math.round(x.k*m),gl=P?P.gl:"keep";
+var junk=x.c==="sweet"||(x.c==="drink"&&(x.u>8||x.n==="Пиво"||x.n==="Красное вино"))||x.k>=400||x.f>=30||/фри|пончик|бургер|хот-дог|шаурма|майонез|колбас|сосис|бекон|пицца|круассан/i.test(x.n);
+if(junk){var why=[x.u>=40?"много быстрых углеводов":"",x.f>=30?"много жиров":"",x.k>=400?"очень калорийно":"",(x.n==="Пиво"||x.n==="Красное вино")?"алкоголь даёт пустые калории":""].filter(Boolean).join(", ")||"много калорий при малой пользе";
+var eff=gl==="lose"?"замедлит похудение, а при частом употреблении вес пойдёт вверх":gl==="gain"?"даст набор в основном за счёт жира и сахара":"при частом употреблении вес начнёт расти";
+return{t:"warn",s:"⚠️ "+x.e+" "+x.n+" ("+k+" ккал в "+g+" г): "+why+". Это "+eff+". Лучше выбрать: "+ALT[x.c]+"."}}
+if(x.p>=15&&x.k<=250)return{t:"ok",s:"✅ "+x.e+" "+x.n+": хороший выбор, много белка и умеренно калорий ("+k+" ккал)."};
+if(x.c==="veg"||x.c==="fruit")return{t:"ok",s:"✅ "+x.e+" "+x.n+": полезно, клетчатка и витамины ("+k+" ккал)."};
+return{t:"ok",s:"👍 "+x.e+" "+x.n+": "+k+" ккал, Б "+r1(x.p*m)+" · Ж "+r1(x.f*m)+" · У "+r1(x.u*m)+"."}}
+function toast(t,s){var e=$("#toast");e.className="on "+t;e.textContent=s;clearTimeout(tt);tt=setTimeout(function(){e.className=""},6000)}
+function add(i,g){var f=plate.filter(function(p){return p.i===i&&p.m===cm})[0];if(f)f.g+=g;else plate.push({i:i,g:g,m:cm});
+var j=judge(FOODS[i],g),S=sums(),lim=T.k*MEALS[cm][2];if(S.m[cm]>lim*1.3)j.s+=" Это уже выше лимита на "+MEALS[cm][0].toLowerCase()+" (~"+Math.round(lim)+" ккал).";
+$("#note").className="note "+j.t;$("#note").textContent=j.s;toast(j.t,j.s);var bar=$("#bar");bar.classList.remove("bump");void bar.offsetWidth;bar.classList.add("bump");refresh()}
+function coach(){var S=sums(),r={k:T.k-S.k,p:T.p-S.p,f:T.f-S.f,u:T.u-S.u},m,gl=P?P.gl:"keep";
+if(!plate.length)m="Привет! Я Нутри 🥑 Задай параметры выше, добавляй еду в завтрак, обед и ужин, а я подскажу, что лучше съесть и чем рискуешь. Для начала могу предложить:";
+else if(r.k<-T.k*.05)m="⚠️ Ты выше нормы на "+Math.round(-r.k)+" ккал. Если так есть каждый день, вес "+(gl==="gain"?"будет расти быстрее, чем нужно":"пойдёт вверх")+". Дальше лучше овощи, вода и немного белка:";
+else if(r.k<120)m="✅ Норма почти набрана. Остались лёгкие варианты:";
+else m="Осталось "+Math.round(r.k)+" ккал. "+(r.p>20?"Не хватает белка: ещё "+Math.round(r.p)+" г. ":"")+(r.u>60?"Углеводов ещё "+Math.round(r.u)+" г. ":"")+"Вот что подойдёт:";
+$("#msg").textContent=m;var list;
+if(r.k<120&&plate.length)list=["Огурец","Помидор","Брокколи"].map(function(n){for(var i=0;i<FOODS.length;i++)if(FOODS[i].n===n)return{i:i,g:200}});
+else{var cnt={};list=FOODS.map(function(x,i){if("sweet,sauce,drink".indexOf(x.c)>-1||/бекон|колбас|сосис|круассан|пицца|пончик|ветчин|майонез|фри|икра|пельмен/i.test(x.n)||(x.k>320&&x.c!=="nuts"))return null;var g=x.c==="nuts"?30:x.c==="veg"?200:150,mm=g/100,k=x.k*mm;if(k>r.k*.8)return null;var rp=Math.max(r.p,0),ru=Math.max(r.u,0),rf=Math.max(r.f,0);
+return{i:i,g:g,c:x.c,s:Math.min(x.p*mm,rp)/(rp+10)*1.6+Math.min(x.u*mm,ru)/(ru+20)+Math.min(x.f*mm,rf)/(rf+10)*.3-k/(r.k+1)*(gl==="lose"?.9:.5)}}).filter(Boolean).sort(function(a,b){return b.s-a.s}).filter(function(o){cnt[o.c]=(cnt[o.c]||0)+1;return cnt[o.c]<=2}).slice(0,5)}
+$("#sug").innerHTML=list.map(function(o,n){var x=FOODS[o.i];return '<button data-i="'+o.i+'" data-g="'+o.g+'" style="animation-delay:'+n*60+'ms">'+x.e+' '+x.n+' · '+o.g+' г</button>'}).join("")}
+function sg(v){return(v>0?"+":"−")+r1(Math.abs(v)).toString().replace(".",",")}
+function fc(){var el=$("#fc"),S=sums();
+if(!TD){el.innerHTML='<b>⚖️ Прогноз веса</b><p>Заполни параметры и нажми «Рассчитать мою норму», тогда я покажу, как рацион влияет на вес.</p>';return}
+if(!plate.length){el.innerHTML='<b>⚖️ Прогноз веса</b><p>Твой расход ≈ '+Math.round(TD)+' ккал в день. Добавь еду в тарелку, и я посчитаю, сколько кг ты наберёшь или скинешь.</p>';return}
+var inc=S.k<T.k*.6,eat=inc?T.k:S.k,bal=eat-TD,wk=bal*7/7700,mo=bal*30/7700,h='<b>⚖️ Прогноз веса</b><p>Расход ≈ '+Math.round(TD)+' ккал, '+(inc?'по твоей норме ':'съедено ')+Math.round(eat)+': '+(bal>0?'профицит +':'дефицит −')+Math.abs(Math.round(bal))+' ккал.</p><p class="big '+(bal>0?'up':'dn')+'">'+sg(wk)+' кг в неделю · '+sg(mo)+' кг в месяц</p>';
+if(P.tw&&Math.abs(wk)>.02){if((bal<0&&P.tw<P.w)||(bal>0&&P.tw>P.w))h+='<p>До '+P.tw+' кг примерно <b>'+Math.ceil(Math.abs(P.tw-P.w)/Math.abs(wk))+' нед.</b> при таком питании каждый день.</p>';else h+='<p>Для цели '+P.tw+' кг нужен '+(P.tw<P.w?'дефицит':'профицит')+' калорий, сейчас наоборот.</p>'}
+if(bal<-TD*.3)h+='<p class="warn">⚠️ Слишком резкий дефицит: вместе с жиром уходят мышцы и силы. Безопаснее терять 0,3–0,7 кг в неделю.</p>';
+if(!inc&&S.k<P.min)h+='<p class="warn">⚠️ Это ниже безопасного минимума ('+P.min+' ккал). Не стоит так голодать.</p>';
+if(inc)h+='<p class="tiny">Пока в тарелке '+Math.round(S.k)+' из '+T.k+' ккал, поэтому прогноз выше рассчитан по твоей норме. Добавь всё, что съешь за день, и я пересчитаю по факту.</p>';
+el.innerHTML=h+'<p class="tiny">Примерный расчёт: 1 кг ≈ 7700 ккал. Реально результат зависит от воды, сна и активности.</p>'}
+function refresh(){pl();totals();coach();fc()}
+function calc(){var w=+$("#w").value,h=+$("#h").value,a=+$("#age").value,o=$("#normOut");
+if(!(w>=30&&w<=300&&h>=120&&h<=230&&a>=18&&a<=90)){o.innerHTML='<p class="warn">Проверь данные: вес 30–300 кг, рост 120–230 см, возраст 18–90 лет. Калькулятор рассчитан на взрослых.</p>';return}
+var gl=$("#gl").value,bmr=10*w+6.25*h-5*a+(sex==="m"?5:-161);TD=bmr*(+$("#act").value);var k=TD*(gl==="lose"?.85:gl==="gain"?1.1:1),min=sex==="m"?1500:1200,fl=false;if(k<min){k=min;fl=true}
+var p=Math.min(w*(gl==="lose"?2:gl==="gain"?1.8:1.6),k*.35/4),f=Math.max(.8*w,k*.25/9),u=Math.max(0,(k-p*4-f*9)/4);
+T={k:Math.round(k),p:Math.round(p),f:Math.round(f),u:Math.round(u)};P={w:w,gl:gl,tw:+$("#tw").value||0,min:min};
+o.innerHTML='<div class="norm"><div><span>Поддержание веса</span><b>'+Math.round(TD)+' ккал</b></div><div><span>Моя норма на день</span><b>'+T.k+' ккал</b></div></div><div class="nm">Белки <b>'+T.p+' г</b> · Жиры <b>'+T.f+' г</b> · Углеводы <b>'+T.u+' г</b></div>'+(fl?'<p class="warn">Расчёт получился ниже безопасного минимума, поэтому я поставил '+T.k+' ккал. Не снижай калории ещё сильнее.</p>':'')+'<p class="tiny">Формула Миффлина-Сан Жеора, для взрослых 18+. Не заменяет совета врача.</p>';
+document.querySelector(".goal").textContent="Норма на день: "+T.k+" ккал · Б "+T.p+" · Ж "+T.f+" · У "+T.u+" г";refresh();health();diary()}
+$("#grid").addEventListener("click",function(e){var b=e.target.closest(".add");if(!b)return;b.classList.remove("pop");void b.offsetWidth;b.classList.add("pop");add(+b.dataset.i,100)});
+$("#sug").addEventListener("click",function(e){var b=e.target.closest("button");if(b)add(+b.dataset.i,+b.dataset.g)});
+$("#meals").addEventListener("click",function(e){var b=e.target.closest("button");if(b){cm=+b.dataset.m;meals()}});
+$("#sex").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;sex=b.dataset.s;[].forEach.call($("#sex").children,function(x){x.classList.toggle("on",x===b)})});
+$("#calc").addEventListener("click",calc);
+$("#plate").addEventListener("click",function(e){var row=e.target.closest(".row");if(!row)return;var j=+row.dataset.j,t=e.target;if(t.dataset.x)plate.splice(j,1);else if(t.dataset.d)plate[j].g=Math.max(0,plate[j].g+ +t.dataset.d);else return;refresh()});
+$("#plate").addEventListener("input",function(e){var row=e.target.closest(".row");if(!row)return;var j=+row.dataset.j;plate[j].g=Math.max(0,+e.target.value||0);row.querySelector("small").textContent=rowTxt(plate[j]);totals();coach();fc()});
+$("#chips").addEventListener("click",function(e){var b=e.target.closest(".chip");if(b){cat=b.dataset.c;chips();grid()}});
+$("#q").addEventListener("input",function(e){q=e.target.value.trim().toLowerCase();grid()});
+$("#bar").addEventListener("click",function(){$("#pl").scrollIntoView({behavior:"smooth"})});
+$("#cg").addEventListener("click",function(){var n=$("#cn").value.trim();if(!n||$("#ck").value===""){$("#cn").focus();return}FOODS.unshift({n:n,e:"⭐",c:"my",k:+$("#ck").value,p:+$("#cp").value||0,f:+$("#cf").value||0,u:+$("#cu").value||0});plate.forEach(function(p){p.i++});cat="my";chips();grid();["cn","ck","cp","cf","cu"].forEach(function(i){$("#"+i).value=""});window.scrollTo({top:$("#chips").offsetTop-20,behavior:"smooth"})});
+function theme(t,anim){document.documentElement.dataset.theme=t;var b=$("#theme");b.textContent=t==="dark"?"☀️":"🌙";if(anim){b.classList.add("spin");setTimeout(function(){b.classList.remove("spin")},520)}try{localStorage.setItem("th",t)}catch(e){}}
+$("#theme").addEventListener("click",function(){theme(document.documentElement.dataset.theme==="dark"?"light":"dark",true)});
+var sv=null;try{sv=localStorage.getItem("th")}catch(e){}theme(sv==="dark"?"dark":"light");
+var CODES=["937u6dwg2k", "nawlfw0qwb", "m8kti51z59", "13qzilh2c7n", "19xxhngaudq", "1zmkmybfy01", "ws5ehfpvcv", "b47obmdck4", "22pdn1g6smy", "1peifgyvp6b", "15sgarxujsg", "23fmu761r6a", "awr5gp0ygk", "26er3xc1o1c", "728c9ln74v", "bikpsyohoj", "1nxh40yjbie", "1h0ei0gy09t", "fhiowj7hwe", "all9sn47e8", "z6fk9ykc7r", "1ruaged48lj", "77bf0gzjzy", "1k8jx81y20s", "27prv7yktz2", "gihmcru0r2", "aed8azhsmd", "16oemh70ma7", "1998t6rctu0", "2o4gp6167a"];
+function hs(s){var h1=0xdeadbeef,h2=0x41c6ce57;for(var i=0,c;i<s.length;i++){c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return(4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
+function copy(t,ok){function fb(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(e){}a.remove();toast("ok",ok)}try{navigator.clipboard.writeText(t).then(function(){toast("ok",ok)},fb)}catch(e){fb()}}
+function prem(){var on=false;try{on=localStorage.getItem("pm")==="1"}catch(e){}$("#lock").style.display=on?"none":"block";$("#open").style.display=on?"block":"none";if(on){diary();health()}}
+$("#unl").addEventListener("click",function(){var c=$("#code").value.toUpperCase().replace(/[^A-Z0-9]/g,"");if(c&&CODES.indexOf(hs("kbju|"+c))>-1){try{localStorage.setItem("pm","1")}catch(e){}$("#cmsg").textContent="";prem();toast("ok","⭐ Премиум открыт. Спасибо!")}else $("#cmsg").textContent="Код не подошёл. Проверь, нет ли ошибок или пробелов."});
+$("#cp").addEventListener("click",function(){copy("+79262891707","Номер скопирован")});
+var POOL=[[["Яйцо куриное","Творог 5%","Омлет","Йогурт натуральный"],["Овсянка на воде","Хлеб цельнозерновой","Гречка (варёная)"],["Банан","Яблоко","Клубника","Черника"],["Миндаль","Грецкий орех"]],[["Куриная грудка (варёная)","Индейка (грудка)","Говядина (варёная)","Треска"],["Гречка (варёная)","Рис бурый (варёный)","Булгур (варёный)","Картофель (варёный)","Макароны (варёные)"],["Огурец","Помидор","Брокколи","Капуста белокочанная","Болгарский перец"],["Оливковое масло"]],[["Лосось","Треска","Креветки","Куриная грудка (варёная)","Творог обезжиренный"],["Чечевица (варёная)","Картофель (варёный)","Кускус (варёный)"],["Огурец","Брокколи","Помидор","Шпинат"],["Оливковое масло"]],[["Йогурт натуральный","Творог обезжиренный","Кефир 1%"],["Яблоко","Банан","Груша","Мандарин"],[],["Миндаль","Арахис"]]];
+function fi(n){for(var i=0;i<FOODS.length;i++)if(FOODS[i].n===n)return i;return 0}
+function pk(a){return a[Math.floor(Math.random()*a.length)]}
+function rd(g,lo,hi){return Math.round(Math.min(hi,Math.max(lo,g))/10)*10}
+$("#am").addEventListener("click",function(){if(!P){toast("warn","Сначала нажми «Рассчитать мою норму» выше");return}plate=[];
+MEALS.forEach(function(ml,mi){var pl=POOL[mi],k=T.k*ml[2],pp=T.p*ml[2],a=fi(pk(pl[0])),ga=rd(pp*.6/(FOODS[a].p/100),60,250),used=FOODS[a].k*ga/100;plate.push({i:a,g:ga,m:mi});
+if(pl[2].length){var c=fi(pk(pl[2])),gc=mi===0?100:150;plate.push({i:c,g:gc,m:mi});used+=FOODS[c].k*gc/100}
+if(pl[3].length){var d=fi(pk(pl[3])),gd=FOODS[d].c==="nuts"?20:10;plate.push({i:d,g:gd,m:mi});used+=FOODS[d].k*gd/100}
+var b=fi(pk(pl[1]));plate.push({i:b,g:rd((k-used)/(FOODS[b].k/100),40,350),m:mi})});
+refresh();$("#pl").scrollIntoView({behavior:"smooth"});toast("ok","🪄 Меню составлено под твою норму. Нажми ещё раз, чтобы получить другой вариант.")});
+$("#sl").addEventListener("click",function(){if(!plate.length){toast("warn","Тарелка пуста: сначала добавь продукты или составь меню");return}var m={};plate.forEach(function(it){m[it.i]=(m[it.i]||0)+it.g});var t=Object.keys(m).map(function(i){return "• "+FOODS[i].n+": "+m[i]+" г"}).join("\n");$("#slo").textContent="🛒 Список покупок:\n"+t;copy("Список покупок:\n"+t,"Список скопирован")});
+$("#rt").addEventListener("click",function(){if(!plate.length){toast("warn","Тарелка пуста");return}var S=sums(),t=MEALS.map(function(ml,mi){var l=plate.filter(function(it){return it.m===mi});return l.length?ml[1]+" "+ml[0]+":\n"+l.map(function(it){return "  "+FOODS[it.i].n+" — "+it.g+" г"}).join("\n"):""}).filter(Boolean).join("\n")+"\n\nИтого: "+Math.round(S.k)+" ккал, Б "+Math.round(S.p)+" · Ж "+Math.round(S.f)+" · У "+Math.round(S.u)+" г (норма "+T.k+" ккал)";copy(t,"Рацион скопирован")});
+function health(){var w=+$("#w").value,h=+$("#h").value;if(!(w>0&&h>0))return;var q=Math.pow(h/100,2),b=w/q;$("#hl").innerHTML="💧 Вода: ≈ <b>"+r1(w*.033)+" л</b> в день<br>⚖️ ИМТ: <b>"+r1(b)+"</b> ("+(b<18.5?"ниже нормы":b<25?"норма":b<30?"избыточный вес":"ожирение")+")<br>🎯 Здоровый диапазон веса для твоего роста: <b>"+Math.round(18.5*q)+"–"+Math.round(24.9*q)+" кг</b>"}
+$("#w").addEventListener("input",health);$("#h").addEventListener("input",health);
+function dz(){try{return JSON.parse(localStorage.getItem("dz")||"[]")}catch(e){return[]}}
+$("#sv").addEventListener("click",function(){if(!plate.length){toast("warn","Тарелка пуста, нечего сохранять");return}var S=sums(),d=new Date().toISOString().slice(0,10),a=dz().filter(function(x){return x.d!==d});a.push({d:d,k:Math.round(S.k),w:+$("#w").value||0});a.sort(function(x,y){return x.d<y.d?-1:1});try{localStorage.setItem("dz",JSON.stringify(a.slice(-30)))}catch(e){}diary();toast("ok","💾 День сохранён")});
+function diary(){var a=dz().slice(-7),o=$("#dzo");if(!a.length){o.innerHTML='<p class="tiny">Записей пока нет. Вечером нажми «Сохранить день», и здесь появится график.</p>';return}var mx=Math.max.apply(null,a.map(function(x){return x.k}).concat(T.k));
+o.innerHTML=a.map(function(x){return '<div class="dr"><span>'+x.d.slice(8)+"."+x.d.slice(5,7)+'</span><div class="bar"><i style="width:'+x.k/mx*100+'%;background:'+(x.k>T.k*1.05?"#ef476f":"var(--u)")+'"></i></div><span>'+x.k+' ккал</span></div>'}).join("")+(a.length>1&&a[0].w&&a[a.length-1].w?'<p class="tiny">Вес: '+a[0].w+" → "+a[a.length-1].w+" кг ("+sg(a[a.length-1].w-a[0].w)+" кг)</p>":"")}
+prem();chips();meals();grid();refresh();
+</script>
+</body>
+</html>
